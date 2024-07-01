@@ -81,7 +81,7 @@ namespace Org.OpenAPITools.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
+        IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
         {
             yield break;
         }
@@ -124,10 +124,10 @@ namespace Org.OpenAPITools.Model
                 if (utf8JsonReaderOneOf.TokenType == JsonTokenType.PropertyName && currentDepth == utf8JsonReaderOneOf.CurrentDepth - 1)
                 {
                     Utf8JsonReader utf8JsonReaderAppleReq = utf8JsonReader;
-                    OpenAPIClientUtils.TryDeserialize<AppleReq?>(ref utf8JsonReaderAppleReq, jsonSerializerOptions, out appleReq);
+                    ClientUtils.TryDeserialize<AppleReq?>(ref utf8JsonReaderAppleReq, jsonSerializerOptions, out appleReq);
 
                     Utf8JsonReader utf8JsonReaderBananaReq = utf8JsonReader;
-                    OpenAPIClientUtils.TryDeserialize<BananaReq?>(ref utf8JsonReaderBananaReq, jsonSerializerOptions, out bananaReq);
+                    ClientUtils.TryDeserialize<BananaReq?>(ref utf8JsonReaderBananaReq, jsonSerializerOptions, out bananaReq);
                 }
             }
 
@@ -172,7 +172,7 @@ namespace Org.OpenAPITools.Model
         {
             writer.WriteStartObject();
 
-            WriteProperties(ref writer, fruitReq, jsonSerializerOptions);
+            WriteProperties(writer, fruitReq, jsonSerializerOptions);
             writer.WriteEndObject();
         }
 
@@ -183,7 +183,7 @@ namespace Org.OpenAPITools.Model
         /// <param name="fruitReq"></param>
         /// <param name="jsonSerializerOptions"></param>
         /// <exception cref="NotImplementedException"></exception>
-        public void WriteProperties(ref Utf8JsonWriter writer, FruitReq fruitReq, JsonSerializerOptions jsonSerializerOptions)
+        public void WriteProperties(Utf8JsonWriter writer, FruitReq fruitReq, JsonSerializerOptions jsonSerializerOptions)
         {
 
         }
