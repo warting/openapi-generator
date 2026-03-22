@@ -217,4 +217,3 @@ public class ObjectWithDeprecatedFields  implements Serializable {
     }
   }
 }
-

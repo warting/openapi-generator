@@ -118,4 +118,3 @@ public class AdditionalPropertiesAnyType extends HashMap<String, Object> impleme
 
 
 }
-

@@ -119,4 +119,3 @@ public class AdditionalPropertiesNumber extends HashMap<String, BigDecimal> impl
 
 
 }
-

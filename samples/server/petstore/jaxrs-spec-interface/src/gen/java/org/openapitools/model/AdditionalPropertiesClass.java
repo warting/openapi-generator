@@ -433,4 +433,3 @@ public class AdditionalPropertiesClass  implements Serializable {
 
 
 }
-

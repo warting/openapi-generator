@@ -118,4 +118,3 @@ public class AdditionalPropertiesBoolean extends HashMap<String, Boolean> implem
 
 
 }
-

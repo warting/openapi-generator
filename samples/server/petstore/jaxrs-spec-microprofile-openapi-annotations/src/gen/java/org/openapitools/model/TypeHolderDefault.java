@@ -258,4 +258,3 @@ public class TypeHolderDefault  implements Serializable {
     }
   }
 }
-

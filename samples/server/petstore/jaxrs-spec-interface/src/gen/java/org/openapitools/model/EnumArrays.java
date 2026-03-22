@@ -216,4 +216,3 @@ public class EnumArrays  implements Serializable {
 
 
 }
-

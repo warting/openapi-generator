@@ -118,4 +118,3 @@ public class AdditionalPropertiesInteger extends HashMap<String, Integer> implem
 
 
 }
-

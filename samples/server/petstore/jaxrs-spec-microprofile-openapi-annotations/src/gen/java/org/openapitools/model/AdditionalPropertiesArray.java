@@ -119,4 +119,3 @@ public class AdditionalPropertiesArray extends HashMap<String, List> implements 
 
 
 }
-
