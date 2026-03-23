@@ -163,7 +163,7 @@ public class SpringCodegen extends AbstractJavaCodegen
     @Setter protected boolean generateGenericResponseEntity = false;
     @Setter protected boolean useEnumCaseInsensitive = false;
     @Getter @Setter
-    protected boolean useSpringBoot3 = false;
+    protected boolean useSpringBoot3 = true;
     @Getter @Setter
     protected boolean useSpringBoot4 = false;
     @Getter @Setter
@@ -520,9 +520,11 @@ public class SpringCodegen extends AbstractJavaCodegen
         convertPropertyToBooleanAndWriteBack(USE_JACKSON_3, this::setUseJackson3);
         convertPropertyToBooleanAndWriteBack(USE_SPRING_BOOT3, this::setUseSpringBoot3);
         convertPropertyToBooleanAndWriteBack(USE_SPRING_BOOT4, this::setUseSpringBoot4);
-        if(isUseSpringBoot3() && isUseSpringBoot4()){
-            throw new IllegalArgumentException("Choose between Spring Boot 3 and Spring Boot 4");
+
+        if (isUseSpringBoot4()) {
+            setUseSpringBoot3(false);
         }
+
         if (isUseSpringBoot3() || isUseSpringBoot4()) {
             if (AnnotationLibrary.SWAGGER1.equals(getAnnotationLibrary())) {
                 throw new IllegalArgumentException(AnnotationLibrary.SWAGGER1.getPropertyName() + " is not supported with Spring Boot > 3.x");
