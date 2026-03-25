@@ -54,7 +54,7 @@ namespace Org.OpenAPITools.Model
         /// Gets or Sets Content
         /// </summary>
         [JsonPropertyName("content")]
-        public MixedAnyOfContent? Content { get { return this.ContentOption; } set { this.ContentOption = new(value); } }
+        public MixedAnyOfContent? Content { get { return this.ContentOption.Value; } set { this.ContentOption = new(value); } }
 
         /// <summary>
         /// Returns the string presentation of the object

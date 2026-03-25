@@ -55,7 +55,7 @@ namespace Org.OpenAPITools.Model
         /// </summary>
         /// <value>Test capitalization</value>
         [JsonPropertyName("sourceURI")]
-        public string? SourceURI { get { return this.SourceURIOption; } set { this.SourceURIOption = new(value); } }
+        public string? SourceURI { get { return this.SourceURIOption.Value; } set { this.SourceURIOption = new(value); } }
 
         /// <summary>
         /// Returns the string presentation of the object

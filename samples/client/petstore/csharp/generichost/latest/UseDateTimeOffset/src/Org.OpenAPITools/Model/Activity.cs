@@ -54,7 +54,7 @@ namespace Org.OpenAPITools.Model
         /// Gets or Sets ActivityOutputs
         /// </summary>
         [JsonPropertyName("activity_outputs")]
-        public Dictionary<string, List<ActivityOutputElementRepresentation>>? ActivityOutputs { get { return this.ActivityOutputsOption; } set { this.ActivityOutputsOption = new(value); } }
+        public Dictionary<string, List<ActivityOutputElementRepresentation>>? ActivityOutputs { get { return this.ActivityOutputsOption.Value; } set { this.ActivityOutputsOption = new(value); } }
 
         /// <summary>
         /// Returns the string presentation of the object

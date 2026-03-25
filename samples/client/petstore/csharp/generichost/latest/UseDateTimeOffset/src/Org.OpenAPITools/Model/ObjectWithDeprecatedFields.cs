@@ -61,7 +61,7 @@ namespace Org.OpenAPITools.Model
         /// </summary>
         [JsonPropertyName("bars")]
         [Obsolete]
-        public List<string>? Bars { get { return this.BarsOption; } set { this.BarsOption = new(value); } }
+        public List<string>? Bars { get { return this.BarsOption.Value; } set { this.BarsOption = new(value); } }
 
         /// <summary>
         /// Used to track the state of DeprecatedRef
@@ -75,7 +75,7 @@ namespace Org.OpenAPITools.Model
         /// </summary>
         [JsonPropertyName("deprecatedRef")]
         [Obsolete]
-        public DeprecatedObject? DeprecatedRef { get { return this.DeprecatedRefOption; } set { this.DeprecatedRefOption = new(value); } }
+        public DeprecatedObject? DeprecatedRef { get { return this.DeprecatedRefOption.Value; } set { this.DeprecatedRefOption = new(value); } }
 
         /// <summary>
         /// Used to track the state of Id
@@ -89,7 +89,7 @@ namespace Org.OpenAPITools.Model
         /// </summary>
         [JsonPropertyName("id")]
         [Obsolete]
-        public decimal? Id { get { return this.IdOption; } set { this.IdOption = new(value); } }
+        public decimal? Id { get { return this.IdOption.Value; } set { this.IdOption = new(value); } }
 
         /// <summary>
         /// Used to track the state of Uuid
@@ -102,7 +102,7 @@ namespace Org.OpenAPITools.Model
         /// Gets or Sets Uuid
         /// </summary>
         [JsonPropertyName("uuid")]
-        public string? Uuid { get { return this.UuidOption; } set { this.UuidOption = new(value); } }
+        public string? Uuid { get { return this.UuidOption.Value; } set { this.UuidOption = new(value); } }
 
         /// <summary>
         /// Returns the string presentation of the object

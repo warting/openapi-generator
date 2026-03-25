@@ -54,7 +54,7 @@ namespace Org.OpenAPITools.Model
         /// Gets or Sets ArrayArrayNumber
         /// </summary>
         [JsonPropertyName("ArrayArrayNumber")]
-        public List<List<decimal>>? ArrayArrayNumber { get { return this.ArrayArrayNumberOption; } set { this.ArrayArrayNumberOption = new(value); } }
+        public List<List<decimal>>? ArrayArrayNumber { get { return this.ArrayArrayNumberOption.Value; } set { this.ArrayArrayNumberOption = new(value); } }
 
         /// <summary>
         /// Returns the string presentation of the object

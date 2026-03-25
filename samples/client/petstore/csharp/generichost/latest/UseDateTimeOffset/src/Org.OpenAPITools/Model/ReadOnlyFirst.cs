@@ -56,7 +56,7 @@ namespace Org.OpenAPITools.Model
         /// Gets or Sets Bar
         /// </summary>
         [JsonPropertyName("bar")]
-        public string? Bar { get { return this.BarOption; } }
+        public string? Bar { get { return this.BarOption.Value; } }
 
         /// <summary>
         /// Used to track the state of Baz
@@ -69,7 +69,7 @@ namespace Org.OpenAPITools.Model
         /// Gets or Sets Baz
         /// </summary>
         [JsonPropertyName("baz")]
-        public string? Baz { get { return this.BazOption; } set { this.BazOption = new(value); } }
+        public string? Baz { get { return this.BazOption.Value; } set { this.BazOption = new(value); } }
 
         /// <summary>
         /// Returns the string presentation of the object

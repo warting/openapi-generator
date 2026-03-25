@@ -54,7 +54,7 @@ namespace Org.OpenAPITools.Model
         /// Gets or Sets Class
         /// </summary>
         [JsonPropertyName("_class")]
-        public string? Class { get { return this.ClassOption; } set { this.ClassOption = new(value); } }
+        public string? Class { get { return this.ClassOption.Value; } set { this.ClassOption = new(value); } }
 
         /// <summary>
         /// Returns the string presentation of the object

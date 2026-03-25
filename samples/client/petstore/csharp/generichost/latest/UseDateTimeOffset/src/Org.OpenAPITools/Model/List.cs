@@ -54,7 +54,7 @@ namespace Org.OpenAPITools.Model
         /// Gets or Sets Var123List
         /// </summary>
         [JsonPropertyName("123-list")]
-        public string? Var123List { get { return this.Var123ListOption; } set { this.Var123ListOption = new(value); } }
+        public string? Var123List { get { return this.Var123ListOption.Value; } set { this.Var123ListOption = new(value); } }
 
         /// <summary>
         /// Returns the string presentation of the object

@@ -58,7 +58,7 @@ namespace Org.OpenAPITools.Model
         /// Gets or Sets ColorCode
         /// </summary>
         [JsonPropertyName("color_code")]
-        public string? ColorCode { get { return this.ColorCodeOption; } set { this.ColorCodeOption = new(value); } }
+        public string? ColorCode { get { return this.ColorCodeOption.Value; } set { this.ColorCodeOption = new(value); } }
 
         /// <summary>
         /// Used to track the state of Cultivar
@@ -71,7 +71,7 @@ namespace Org.OpenAPITools.Model
         /// Gets or Sets Cultivar
         /// </summary>
         [JsonPropertyName("cultivar")]
-        public string? Cultivar { get { return this.CultivarOption; } set { this.CultivarOption = new(value); } }
+        public string? Cultivar { get { return this.CultivarOption.Value; } set { this.CultivarOption = new(value); } }
 
         /// <summary>
         /// Used to track the state of Origin
@@ -84,7 +84,7 @@ namespace Org.OpenAPITools.Model
         /// Gets or Sets Origin
         /// </summary>
         [JsonPropertyName("origin")]
-        public string? Origin { get { return this.OriginOption; } set { this.OriginOption = new(value); } }
+        public string? Origin { get { return this.OriginOption.Value; } set { this.OriginOption = new(value); } }
 
         /// <summary>
         /// Returns the string presentation of the object

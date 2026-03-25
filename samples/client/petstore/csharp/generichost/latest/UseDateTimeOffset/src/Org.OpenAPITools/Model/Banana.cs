@@ -54,7 +54,7 @@ namespace Org.OpenAPITools.Model
         /// Gets or Sets LengthCm
         /// </summary>
         [JsonPropertyName("lengthCm")]
-        public decimal? LengthCm { get { return this.LengthCmOption; } set { this.LengthCmOption = new(value); } }
+        public decimal? LengthCm { get { return this.LengthCmOption.Value; } set { this.LengthCmOption = new(value); } }
 
         /// <summary>
         /// Returns the string presentation of the object
