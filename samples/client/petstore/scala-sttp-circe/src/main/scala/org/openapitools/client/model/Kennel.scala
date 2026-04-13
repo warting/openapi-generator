@@ -15,30 +15,26 @@ import io.circe.{Decoder, DecodingFailure, Encoder, Json}
 import io.circe.syntax._
 import org.openapitools.client.core.JsonSupport._
 
-  /**
-   * Pet category
-   * A category for a pet
-   */
-case class Category(
-  id: Option[Long] = None,
-  name: Option[String] = None
+case class Kennel(
+  name: Option[String] = None,
+  dogs: Option[Seq[Dog]] = None
 )
-object Category {
-  implicit val encoderCategory: Encoder[Category] = Encoder.instance { t =>
+object Kennel {
+  implicit val encoderKennel: Encoder[Kennel] = Encoder.instance { t =>
     Json.fromFields{
       Seq(
-        t.id.map(v => "id" -> v.asJson),
-        t.name.map(v => "name" -> v.asJson)
+        t.name.map(v => "name" -> v.asJson),
+        t.dogs.map(v => "dogs" -> v.asJson)
       ).flatten
     }
   }
-  implicit val decoderCategory: Decoder[Category] = Decoder.instance { c =>
+  implicit val decoderKennel: Decoder[Kennel] = Decoder.instance { c =>
     for {
-      id <- c.downField("id").as[Option[Long]]
       name <- c.downField("name").as[Option[String]]
-    } yield Category(
-      id = id,
-      name = name
+      dogs <- c.downField("dogs").as[Option[Seq[Dog]]]
+    } yield Kennel(
+      name = name,
+      dogs = dogs
     )
   }
 }
