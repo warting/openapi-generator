@@ -203,6 +203,8 @@ public class SpringCodegen extends AbstractJavaCodegen
     private Map<String, SpringPageableScanUtils.PageableConstraintsData> pageableConstraintsRegistry = new HashMap<>();
     // Map from schema name to detected paged-model info (populated when substituteGenericPagedModel=true)
     private Map<String, PagedModelScanUtils.DetectedPagedModel> pagedModelRegistry = new HashMap<>();
+    // Simple class name of the PagedModel substitute (derived from importMapping; defaults to "PagedModel")
+    private String pagedModelClassName = "PagedModel";
 
     public SpringCodegen() {
         super();
@@ -374,10 +376,10 @@ public class SpringCodegen extends AbstractJavaCodegen
                 + "Requires useBeanValidation=true and library=spring-boot.",
                 generatePageableConstraintValidation));
         cliOptions.add(CliOption.newBoolean(SUBSTITUTE_GENERIC_PAGED_MODEL,
-                "Detect schemas that represent paginated responses (an object with a 'content' array property and a "
+                "Detect schemas that represent paginated responses (an object with a 'content' array property and a 'page' "
                 + "pagination-metadata property) and replace their generated references with "
-                + "org.springframework.data.web.PagedModel<T>. The detected page schemas and the pagination metadata "
-                + "schema are suppressed from code generation. Only applies when library=spring-boot.",
+                + "PagedModel<T>. By default this uses a generated type in the config package (default 'org.openapitools.configuration'), but `importMappings.PagedModel` can override it to a custom/FQCN-mapped type. The detected page schemas and the pagination metadata "
+                + "schema are suppressed from code generation. Only applies when library=spring-boot or spring-http-interface.",
                 substituteGenericPagedModel));
 
     }
@@ -588,11 +590,14 @@ public class SpringCodegen extends AbstractJavaCodegen
 
         convertPropertyToBooleanAndWriteBack(ADDITIONAL_NOT_NULL_ANNOTATIONS, this::setAdditionalNotNullAnnotations);
 
+        if (SPRING_BOOT.equals(library) || SPRING_HTTP_INTERFACE.equals(library)) {
+            convertPropertyToBooleanAndWriteBack(SUBSTITUTE_GENERIC_PAGED_MODEL, this::setSubstituteGenericPagedModel);
+        }
+
         if (SPRING_BOOT.equals(library)) {
             convertPropertyToBooleanAndWriteBack(AUTO_X_SPRING_PAGINATED, this::setAutoXSpringPaginated);
             convertPropertyToBooleanAndWriteBack(GENERATE_SORT_VALIDATION, this::setGenerateSortValidation);
             convertPropertyToBooleanAndWriteBack(GENERATE_PAGEABLE_CONSTRAINT_VALIDATION, this::setGeneratePageableConstraintValidation);
-            convertPropertyToBooleanAndWriteBack(SUBSTITUTE_GENERIC_PAGED_MODEL, this::setSubstituteGenericPagedModel);
         }
 
         // override parent one
@@ -867,10 +872,25 @@ public class SpringCodegen extends AbstractJavaCodegen
             }
         }
 
-        if (SPRING_BOOT.equals(library) && substituteGenericPagedModel) {
+        if ((SPRING_BOOT.equals(library) || SPRING_HTTP_INTERFACE.equals(library)) && substituteGenericPagedModel) {
             pagedModelRegistry = PagedModelScanUtils.scanPagedModels(openAPI);
             if (!pagedModelRegistry.isEmpty()) {
-                importMapping.putIfAbsent("PagedModel", "org.springframework.data.web.PagedModel");
+                boolean customMapping = importMapping.containsKey("PagedModel");
+                importMapping.putIfAbsent("PagedModel", configPackage + ".PagedModel");
+                if (!customMapping) {
+                    // No custom class provided — generate the simple PagedModel into the config package.
+                    supportingFiles.add(new SupportingFile("pagedModel.mustache",
+                            (sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "PagedModel.java"));
+                }
+                // Derive the actual simple class name from the FQN in importMapping so that a
+                // custom mapping (e.g. "PagedModel" → "com.example.MyPagedModel") is respected.
+                // The simple name of the FQN becomes the token used in generated code, and is
+                // registered in importMapping so that template import resolution works.
+                String fqn = importMapping.get("PagedModel");
+                pagedModelClassName = fqn.substring(fqn.lastIndexOf('.') + 1);
+                if (!pagedModelClassName.equals("PagedModel")) {
+                    importMapping.put(pagedModelClassName, fqn);
+                }
                 LOGGER.info("substituteGenericPagedModel: detected {} paged-model schema(s): {}",
                         pagedModelRegistry.size(), pagedModelRegistry.keySet());
             }
@@ -1352,21 +1372,24 @@ public class SpringCodegen extends AbstractJavaCodegen
                     pagedModelRegistry.get(codegenOperation.returnBaseType);
             if (detected != null) {
                 String oldType = codegenOperation.returnType;
-                String newBaseType = "PagedModel<" + detected.itemSchemaName + ">";
+                // Run through toModelName so that schemaMappings (e.g. User → com.example.MyUser)
+                // are honored: the mapped name is used both in the type arg and for import resolution.
+                String itemType = toModelName(detected.itemSchemaName);
+                String newBaseType = pagedModelClassName + "<" + itemType + ">";
                 codegenOperation.returnType = newBaseType;
-                codegenOperation.returnBaseType = "PagedModel";
+                codegenOperation.returnBaseType = pagedModelClassName;
                 // Clear any container flag — PagedModel is not itself a List/array
                 codegenOperation.returnContainer = null;
-                // Add item type import (needed for PagedModel<User> in method signature)
-                codegenOperation.imports.add(detected.itemSchemaName);
-                codegenOperation.imports.add("PagedModel");
+                // Add item type import (needed for PagedModel<T> in method signature)
+                codegenOperation.imports.add(itemType);
+                codegenOperation.imports.add(pagedModelClassName);
                 // Remove paged schema import when no annotations are generated —
                 // the class is suppressed and not referenced anywhere
                 if (getAnnotationLibrary() == AnnotationLibrary.NONE) {
                     codegenOperation.imports.remove(detected.schemaName);
                 }
-                LOGGER.info("substituteGenericPagedModel: operation '{}': replacing return type '{}' with PagedModel<{}>",
-                        codegenOperation.operationId, oldType, detected.itemSchemaName);
+                LOGGER.info("substituteGenericPagedModel: operation '{}': replacing return type '{}' with {}<{}>",
+                        codegenOperation.operationId, oldType, pagedModelClassName, itemType);
             }
         }
 

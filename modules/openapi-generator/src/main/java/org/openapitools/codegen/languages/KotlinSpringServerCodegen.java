@@ -200,6 +200,8 @@ public class KotlinSpringServerCodegen extends AbstractKotlinCodegen
 
     // Map from schema name to detected paged-model info (populated when substituteGenericPagedModel=true)
     private Map<String, PagedModelScanUtils.DetectedPagedModel> pagedModelRegistry = new HashMap<>();
+    // Simple class name of the PagedModel substitute (derived from importMapping; defaults to "PagedModel")
+    private String pagedModelClassName = "PagedModel";
 
     public KotlinSpringServerCodegen() {
         super();
@@ -296,10 +298,10 @@ public class KotlinSpringServerCodegen extends AbstractKotlinCodegen
         addSwitch(GENERATE_SORT_VALIDATION, "Generate a @ValidSort annotation and SortValidator class, and apply @ValidSort to the injected Pageable parameter of operations whose 'sort' parameter has enum values. The annotation validates that sort values in the Pageable object match the allowed enum values from the spec. Requires useBeanValidation=true and library=spring-boot.", generateSortValidation);
         addSwitch(GENERATE_PAGEABLE_CONSTRAINT_VALIDATION, "Generate a @ValidPageable annotation and PageableConstraintValidator class, and apply @ValidPageable to the injected Pageable parameter of operations whose 'page' or 'size' parameter specifies a maximum constraint. The annotation enforces those constraints on the Pageable object that replaces the individual page/size query parameters. Requires useBeanValidation=true and library=spring-boot.", generatePageableConstraintValidation);
         addSwitch(SUBSTITUTE_GENERIC_PAGED_MODEL,
-                "Detect schemas that represent paginated responses (an object with a 'content' array property and a "
+                "Detect schemas that represent paginated responses (an object with a 'content' array property and a 'page' "
                 + "pagination-metadata property) and replace their generated references with "
-                + "org.springframework.data.web.PagedModel<T>. The detected page schemas and the pagination metadata "
-                + "schema are suppressed from code generation. Only applies when library=spring-boot.",
+                + "PagedModel<T>. By default this uses a generated type in the config package (default 'org.openapitools.configuration'), but `importMappings.PagedModel` can override it to a custom/FQCN-mapped type. The detected page schemas and the pagination metadata "
+                + "schema are suppressed from code generation. Only applies when library=spring-boot or spring-declarative-http-interface.",
                 substituteGenericPagedModel);
         addSwitch(COMPANION_OBJECT, "Whether to generate companion objects in data classes, enabling companion extensions.", companionObject);
         supportedLibraries.put(SPRING_BOOT, "Spring-boot Server application.");
@@ -741,7 +743,7 @@ public class KotlinSpringServerCodegen extends AbstractKotlinCodegen
             this.setGeneratePageableConstraintValidation(convertPropertyToBoolean(GENERATE_PAGEABLE_CONSTRAINT_VALIDATION));
         }
         writePropertyBack(GENERATE_PAGEABLE_CONSTRAINT_VALIDATION, generatePageableConstraintValidation);
-        if (additionalProperties.containsKey(SUBSTITUTE_GENERIC_PAGED_MODEL) && library.equals(SPRING_BOOT)) {
+        if (additionalProperties.containsKey(SUBSTITUTE_GENERIC_PAGED_MODEL) && (library.equals(SPRING_BOOT) || library.equals(SPRING_DECLARATIVE_HTTP_INTERFACE_LIBRARY))) {
             this.setSubstituteGenericPagedModel(convertPropertyToBoolean(SUBSTITUTE_GENERIC_PAGED_MODEL));
         }
         writePropertyBack(SUBSTITUTE_GENERIC_PAGED_MODEL, substituteGenericPagedModel);
@@ -1142,21 +1144,24 @@ public class KotlinSpringServerCodegen extends AbstractKotlinCodegen
                     pagedModelRegistry.get(codegenOperation.returnBaseType);
             if (detected != null) {
                 String oldType = codegenOperation.returnType;
-                String newBaseType = "PagedModel<" + detected.itemSchemaName + ">";
+                // Run through toModelName so that schemaMappings (e.g. User → com.example.MyUser)
+                // are honored: the mapped name is used both in the type arg and for import resolution.
+                String itemType = toModelName(detected.itemSchemaName);
+                String newBaseType = pagedModelClassName + "<" + itemType + ">";
                 codegenOperation.returnType = newBaseType;
-                codegenOperation.returnBaseType = "PagedModel";
+                codegenOperation.returnBaseType = pagedModelClassName;
                 // Clear any container flag — PagedModel is not itself a List/array
                 codegenOperation.returnContainer = null;
-                // Add item type import (needed for PagedModel<User> in method signature)
-                codegenOperation.imports.add(detected.itemSchemaName);
-                codegenOperation.imports.add("PagedModel");
+                // Add item type import (needed for PagedModel<T> in method signature)
+                codegenOperation.imports.add(itemType);
+                codegenOperation.imports.add(pagedModelClassName);
                 // Remove paged schema import when no annotations are generated —
                 // the class is suppressed and not referenced anywhere
                 if (getAnnotationLibrary() == AnnotationLibrary.NONE) {
                     codegenOperation.imports.remove(detected.schemaName);
                 }
-                LOGGER.info("substituteGenericPagedModel: operation '{}': replacing return type '{}' with PagedModel<{}>",
-                        codegenOperation.operationId, oldType, detected.itemSchemaName);
+                LOGGER.info("substituteGenericPagedModel: operation '{}': replacing return type '{}' with {}<{}>",
+                        codegenOperation.operationId, oldType, pagedModelClassName, itemType);
             }
         }
 
@@ -1199,10 +1204,25 @@ public class KotlinSpringServerCodegen extends AbstractKotlinCodegen
             }
         }
 
-        if (SPRING_BOOT.equals(library) && substituteGenericPagedModel) {
+        if ((SPRING_BOOT.equals(library) || SPRING_DECLARATIVE_HTTP_INTERFACE_LIBRARY.equals(library)) && substituteGenericPagedModel) {
             pagedModelRegistry = PagedModelScanUtils.scanPagedModels(openAPI);
             if (!pagedModelRegistry.isEmpty()) {
-                importMapping.putIfAbsent("PagedModel", "org.springframework.data.web.PagedModel");
+                boolean customMapping = importMapping.containsKey("PagedModel");
+                importMapping.putIfAbsent("PagedModel", configPackage + ".PagedModel");
+                if (!customMapping) {
+                    // No custom class provided — generate the simple PagedModel into the config package.
+                    supportingFiles.add(new SupportingFile("pagedModel.mustache",
+                            (sourceFolder + File.separator + configPackage).replace(".", File.separator), "PagedModel.kt"));
+                }
+                // Derive the actual simple class name from the FQN in importMapping so that a
+                // custom mapping (e.g. "PagedModel" → "com.example.MyPagedModel") is respected.
+                // The simple name of the FQN becomes the token used in generated code, and is
+                // registered in importMapping so that template import resolution works.
+                String fqn = importMapping.get("PagedModel");
+                pagedModelClassName = fqn.substring(fqn.lastIndexOf('.') + 1);
+                if (!pagedModelClassName.equals("PagedModel")) {
+                    importMapping.putIfAbsent(pagedModelClassName, fqn);
+                }
                 LOGGER.info("substituteGenericPagedModel: detected {} paged-model schema(s): {}",
                         pagedModelRegistry.size(), pagedModelRegistry.keySet());
             }
