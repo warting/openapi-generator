@@ -1,5 +1,9 @@
 package org.openapitools.configuration;
 
+import java.math.BigDecimal;
+import java.net.URI;
+import java.util.UUID;
+
 import org.openapitools.model.PetSort;
 import org.openapitools.model.PetSortEnum;
 
