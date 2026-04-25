@@ -1870,6 +1870,10 @@ public class DefaultCodegen implements CodegenConfig {
 
         // Register common Mustache lambdas.
         registerMustacheLambdas();
+
+        // Initialize mustache braces placeholders for all generators
+        additionalProperties.putIfAbsent("openbrace", "{");
+        additionalProperties.putIfAbsent("closebrace", "}");
     }
 
     /**
