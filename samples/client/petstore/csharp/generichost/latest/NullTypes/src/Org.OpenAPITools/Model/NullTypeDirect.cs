@@ -57,7 +57,7 @@ namespace Org.OpenAPITools.Model
         /// </summary>
         /// <value>This property can only ever be null.  In OAS 3.1 you express that with &#x60;type: null&#x60;.  The C# generator must map this to a nullable Object. </value>
         [JsonPropertyName("alwaysNull")]
-        public Object? AlwaysNull { get { return this.AlwaysNullOption; } set { this.AlwaysNullOption = new(value); } }
+        public Object? AlwaysNull { get { return this.AlwaysNullOption.Value; } set { this.AlwaysNullOption = new(value); } }
 
         /// <summary>
         /// Used to track the state of Id
@@ -70,7 +70,7 @@ namespace Org.OpenAPITools.Model
         /// Gets or Sets Id
         /// </summary>
         [JsonPropertyName("id")]
-        public long? Id { get { return this.IdOption; } set { this.IdOption = new(value); } }
+        public long? Id { get { return this.IdOption.Value; } set { this.IdOption = new(value); } }
 
         /// <summary>
         /// Returns the string presentation of the object

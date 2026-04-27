@@ -35,9 +35,9 @@ namespace Org.OpenAPITools.Model
         /// </summary>
         /// <param name="id">Unique identifier.</param>
         /// <param name="name">Widget name.</param>
-        /// <param name="color">color</param>
+        /// <param name="color">Optional CSS color string; null when not set.</param>
         /// <param name="debugInfo">Always null in production. Maps to nullable Object in C#. </param>
-        /// <param name="shape">shape</param>
+        /// <param name="shape">Optional shape; null when no shape is assigned.</param>
         [JsonConstructor]
         public Widget(long id, string name, Option<string?> color = default, Option<Object?> debugInfo = default, Option<Shape?> shape = default)
         {
@@ -73,10 +73,11 @@ namespace Org.OpenAPITools.Model
         public Option<string?> ColorOption { get; private set; }
 
         /// <summary>
-        /// Gets or Sets Color
+        /// Optional CSS color string; null when not set.
         /// </summary>
+        /// <value>Optional CSS color string; null when not set.</value>
         [JsonPropertyName("color")]
-        public string? Color { get { return this.ColorOption; } set { this.ColorOption = new(value); } }
+        public string? Color { get { return this.ColorOption.Value; } set { this.ColorOption = new(value); } }
 
         /// <summary>
         /// Used to track the state of DebugInfo
@@ -90,7 +91,7 @@ namespace Org.OpenAPITools.Model
         /// </summary>
         /// <value>Always null in production. Maps to nullable Object in C#. </value>
         [JsonPropertyName("debugInfo")]
-        public Object? DebugInfo { get { return this.DebugInfoOption; } set { this.DebugInfoOption = new(value); } }
+        public Object? DebugInfo { get { return this.DebugInfoOption.Value; } set { this.DebugInfoOption = new(value); } }
 
         /// <summary>
         /// Used to track the state of Shape
@@ -100,10 +101,11 @@ namespace Org.OpenAPITools.Model
         public Option<Shape?> ShapeOption { get; private set; }
 
         /// <summary>
-        /// Gets or Sets Shape
+        /// Optional shape; null when no shape is assigned.
         /// </summary>
+        /// <value>Optional shape; null when no shape is assigned.</value>
         [JsonPropertyName("shape")]
-        public Shape? Shape { get { return this.ShapeOption; } set { this.ShapeOption = new(value); } }
+        public Shape? Shape { get { return this.ShapeOption.Value; } set { this.ShapeOption = new(value); } }
 
         /// <summary>
         /// Returns the string presentation of the object

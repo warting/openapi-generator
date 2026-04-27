@@ -58,7 +58,7 @@ namespace Org.OpenAPITools.Model
         /// Gets or Sets B
         /// </summary>
         [JsonPropertyName("b")]
-        public int? B { get { return this.BOption; } set { this.BOption = new(value); } }
+        public int? B { get { return this.BOption.Value; } set { this.BOption = new(value); } }
 
         /// <summary>
         /// Used to track the state of G
@@ -71,7 +71,7 @@ namespace Org.OpenAPITools.Model
         /// Gets or Sets G
         /// </summary>
         [JsonPropertyName("g")]
-        public int? G { get { return this.GOption; } set { this.GOption = new(value); } }
+        public int? G { get { return this.GOption.Value; } set { this.GOption = new(value); } }
 
         /// <summary>
         /// Used to track the state of R
@@ -84,7 +84,7 @@ namespace Org.OpenAPITools.Model
         /// Gets or Sets R
         /// </summary>
         [JsonPropertyName("r")]
-        public int? R { get { return this.ROption; } set { this.ROption = new(value); } }
+        public int? R { get { return this.ROption.Value; } set { this.ROption = new(value); } }
 
         /// <summary>
         /// Returns the string presentation of the object

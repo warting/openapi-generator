@@ -48,6 +48,8 @@ components:
     ShapeOrNull:
       allOf:
       - $ref: "#/components/schemas/Shape"
+      description: |
+        A value that is either a Shape or null. OAS 3.1 expresses nullable via oneOf with a null member instead of the deprecated `nullable: true` attribute.
       nullable: true
     ColorOrNull:
       anyOf:
@@ -79,8 +81,10 @@ components:
         shape:
           allOf:
           - $ref: "#/components/schemas/Shape"
+          description: Optional shape; null when no shape is assigned.
           nullable: true
         color:
+          description: Optional CSS color string; null when not set.
           nullable: true
           type: string
       required:

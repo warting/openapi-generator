@@ -26,7 +26,7 @@ using Org.OpenAPITools.Client;
 namespace Org.OpenAPITools.Model
 {
     /// <summary>
-    /// ShapeOrNull
+    /// A value that is either a Shape or null. OAS 3.1 expresses nullable via oneOf with a null member instead of the deprecated &#x60;nullable: true&#x60; attribute. 
     /// </summary>
     public partial class ShapeOrNull : IValidatableObject
     {
@@ -64,7 +64,7 @@ namespace Org.OpenAPITools.Model
         /// </summary>
         /// <value>Area in square units.</value>
         [JsonPropertyName("area")]
-        public double? Area { get { return this.AreaOption; } set { this.AreaOption = new(value); } }
+        public double? Area { get { return this.AreaOption.Value; } set { this.AreaOption = new(value); } }
 
         /// <summary>
         /// Returns the string presentation of the object
