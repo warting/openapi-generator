@@ -655,7 +655,30 @@ java -jar modules/openapi-generator-cli/target/openapi-generator-cli.jar generat
 
 Example:
 ```
-java -jar modules/openapi-generator-cli/target/openapi-generator-cli.jar generate -g spring -i modules/openapi-generator/src/test/resources/3_0/spring/issue_23527.yaml -o /tmp/java-spring/ --openapi-normalizer REPLACE_ONE_OF_BY_DISCRIMINATOR_MAPPING=true
+java -jar modules/openapi-generator-cli/target/openapi-generator-cli.jar generate -g java -i modules/openapi-generator/src/test/resources/3_0/oneOf_issue_23527.yaml -o /tmp/java/ --openapi-normalizer REPLACE_ONE_OF_BY_DISCRIMINATOR_MAPPING=true
+```
+
+Here is what the change in the spec looks like:
+
+```diff
+diff --git a/api/openapi.yaml b/api/openapi.yaml
+index 6f27abd..146c61c 100644
+--- a/api/openapi.yaml
++++ b/api/openapi.yaml
+@@ -9,10 +9,10 @@ components:
+   schemas:
+     GeoJsonObject:
+       discriminator:
++        mapping:
++          MultiPolygon: "#/components/schemas/Multi-Polygon"
++          Polygon: "#/components/schemas/Polygon"
+         propertyName: type
+-      oneOf:
+-      - $ref: "#/components/schemas/Polygon"
+-      - $ref: "#/components/schemas/Multi-Polygon"
+       properties:
+         type:
+           type: string
 ```
 
 - `FILTER`
